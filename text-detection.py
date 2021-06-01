@@ -1,21 +1,32 @@
+#TechVidvan Text detection and Extraction using OpenCV
+
 import cv2
+import string
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-#pytesseract.pytesseract.tesseract_cmd
+
+
+# Reading image 
 img = cv2.imread("image.png")
-
-
-
+# Convert to RGB 
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+# Detect texts from image
+texts = pytesseract.image_to_string(img)
+print(texts)
 
-st = pytesseract.image_to_string(img)
+conf = r'-c tessedit_char_whitelist='+string.digits
+# conf = conf + string.ascii_letters   # uncomment if you want to detect numeric digits and alphabets both.
 
 def draw_boxes_on_character(img):
     img_width = img.shape[1]
     img_height = img.shape[0]
-    boxes = pytesseract.image_to_boxes(img)
+
+    # Return each detected character and their bounding boxes.
+    boxes = pytesseract.image_to_boxes(img, config =conf)
+
+    print(boxes)
     for box in boxes.splitlines():
         box = box.split(" ")
         character = box[0]
@@ -27,9 +38,12 @@ def draw_boxes_on_character(img):
         cv2.putText(img, character, (x, img_height -y2), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255) , 1)
     return img
 
-def draw_boxes_on_strings(img):
-    boxes = pytesseract.image_to_data(img)
-    for count, data in enumerate(boxes.splitlines()):
+def draw_boxes_on_text(img):
+    # Return raw information about the detected texts
+    raw_data = pytesseract.image_to_data(img)
+
+    print(raw_data)
+    for count, data in enumerate(raw_data.splitlines()):
         if count > 0:
             data = data.split()
             if len(data) == 12:
@@ -39,10 +53,10 @@ def draw_boxes_on_strings(img):
                 
     return img
 
-img = draw_boxes_on_character(img)
-#img = draw_boxes_on_strings(img)
+img = draw_boxes_on_character(img)     # uncomment if you want to detect individual characters
 
-#print(bo)
-cv2.imshow("Result", img)
+# img = draw_boxes_on_text(img)    # Uncomment is you want to detect text 
 
+# show the output
+cv2.imshow("Output", img)
 cv2.waitKey(0)
