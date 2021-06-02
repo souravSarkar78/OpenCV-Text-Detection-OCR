@@ -1,5 +1,3 @@
-#TechVidvan Text detection and Extraction using OpenCV
-
 import cv2
 import string
 import pytesseract
